@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: support-agent
+
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: support
+
+  ai:
+    model:
+      chat: ollama
+      embedding: ollama
+
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: llama3.2:1b
+          temperature: 0.2
+      embedding:
+        options:
+          model: nomic-embed-text
+
+    vectorstore:
+      mongodb:
+        collection-name: policy_vectors_local
+        index-name: policy_vector_index_local
+        path-name: embedding
+        initialize-schema: true
+
+    mcp:
+      server:
+        name: support-tools
+        version: 1.0.0
+        type: SYNC
+        protocol: STREAMABLE
+
+server:
+  port: 8081
+
+logging:
+  level:
+    org.springframework.ai: INFO
