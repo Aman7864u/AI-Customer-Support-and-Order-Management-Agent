@@ -4,7 +4,7 @@ spring:
 
   data:
     mongodb:
-      uri: ${MONGODB_URI}
+      uri: ${MONGODB_URI:mongodb+srv://Amanmujawar5555_db:root@cluster0.qvuyvbi.mongodb.net/?appName=Cluster0}
       database: support
 
   ai:
@@ -16,8 +16,9 @@ spring:
       base-url: http://localhost:11434
       chat:
         options:
-          model: llama3.2:1b
-          temperature: 0.2
+          model: llama3.2:3b
+          temperature: 0
+          num-predict: 512
       embedding:
         options:
           model: nomic-embed-text

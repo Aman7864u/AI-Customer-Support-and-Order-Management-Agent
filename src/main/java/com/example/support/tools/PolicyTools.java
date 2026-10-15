@@ -23,18 +23,24 @@ public class PolicyTools {
         this.vectorStore = vectorStore;
     }
 
-    @Tool(description = "Search the company's policy documents (refund, return, delivery, shipping and "
-            + "delay policies) and return the most relevant passages. Use this before answering any "
-            + "policy question such as refund eligibility, return windows or what happens when a delivery is late.")
-    public String searchPolicies(@ToolParam(description = "A short natural-language question about a policy") String question) {
-        List<Document> docs = vectorStore.similaritySearch(
-                SearchRequest.builder().query(question).topK(4).similarityThreshold(0.5).build());
-
-        if (docs == null || docs.isEmpty()) {
-            return "No relevant policy found. Escalate to a human agent if the customer needs a policy decision.";
+    @Tool(description = "Search store policies for return windows, refunds, delivery delays, or warranty.")
+    public String searchPolicies(@ToolParam(description = "Policy question keywords, e.g. 'return window'", required = false) String question) {
+        if (question == null || question.isBlank()) {
+            return "No question provided to search policies.";
         }
-        return docs.stream()
-                .map(d -> "[" + d.getMetadata().getOrDefault("source", "policy") + "]\n" + d.getText())
-                .collect(Collectors.joining("\n\n---\n\n"));
+
+        try {
+            List<Document> docs = vectorStore.similaritySearch(
+                    SearchRequest.builder().query(question.trim()).topK(3).similarityThreshold(0.4).build());
+
+            if (docs == null || docs.isEmpty()) {
+                return "No relevant policy found. Escalate to a human agent if the customer needs a policy decision.";
+            }
+            return docs.stream()
+                    .map(d -> "[" + d.getMetadata().getOrDefault("source", "policy") + "]\n" + d.getText())
+                    .collect(Collectors.joining("\n\n---\n\n"));
+        } catch (Exception e) {
+            return "Unable to search policies at this moment: " + e.getMessage();
+        }
     }
 }

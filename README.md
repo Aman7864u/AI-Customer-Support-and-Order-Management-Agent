@@ -54,19 +54,19 @@ curl -s localhost:8080/api/chat -H 'Content-Type: application/json' \
   -d '{"message":"My order #1025 has not arrived. Can you check its status?"}'
 
 # Follow up in the same conversation (use the conversationId from the first reply)
-curl -s localhost:8080/api/chat -H 'Content-Type: application/json' \
+curl -s localhost:8081/api/chat -H 'Content-Type: application/json' \
   -d '{"conversationId":"<id>","message":"I want a refund instead."}'
 
 # Delivered order, refund policy question
-curl -s localhost:8080/api/chat -H 'Content-Type: application/json' \
+curl -s localhost:8081/api/chat -H 'Content-Type: application/json' \
   -d '{"message":"Order 1026 arrived 6 days ago. Can I still return the watch?"}'
 
 # Product info
-curl -s localhost:8080/api/chat -H 'Content-Type: application/json' \
+curl -s localhost:8081/api/chat -H 'Content-Type: application/json' \
   -d '{"message":"Do you have the USB-C charger in stock?"}'
 
 # Missing order, should say not found and offer help or escalate
-curl -s localhost:8080/api/chat -H 'Content-Type: application/json' \
+curl -s localhost:8081/api/chat -H 'Content-Type: application/json' \
   -d '{"message":"Where is order 9999?"}'
 ```
 

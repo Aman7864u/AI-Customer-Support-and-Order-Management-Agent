@@ -19,17 +19,21 @@ public class OrderTools {
         this.orderRepository = orderRepository;
     }
 
-    @Tool(description = "Find the full details of a customer order using its numeric order ID. "
-            + "Returns items, amount, status, carrier and dates.")
-    public Object getOrder(@ToolParam(description = "Numeric order ID, e.g. 1025") Long orderId) {
+    @Tool(description = "Get order items, amount, and customer details by orderId.")
+    public Object getOrder(@ToolParam(description = "Order ID number, e.g. 1025", required = false) Long orderId) {
+        if (orderId == null) {
+            return Map.of("error", "No order ID provided. Please ask the customer for their order number.");
+        }
         return orderRepository.findById(orderId)
                 .<Object>map(o -> o)
                 .orElse(Map.of("error", "No order found with ID " + orderId));
     }
 
-    @Tool(description = "Check the delivery status of an order: current status, carrier, tracking number, "
-            + "last known location, estimated delivery date and whether it is delayed (and by how many days).")
-    public Object getDeliveryStatus(@ToolParam(description = "Numeric order ID, e.g. 1025") Long orderId) {
+    @Tool(description = "Get tracking number, carrier, shipping location, delivery date, and delay days by orderId.")
+    public Object getDeliveryStatus(@ToolParam(description = "Order ID number, e.g. 1025", required = false) Long orderId) {
+        if (orderId == null) {
+            return Map.of("error", "No order ID provided. Please ask the customer for their order number.");
+        }
         return orderRepository.findById(orderId)
                 .<Object>map(this::toDeliveryInfo)
                 .orElse(Map.of("error", "No order found with ID " + orderId));

@@ -17,9 +17,29 @@ public class ProductTools {
         this.productRepository = productRepository;
     }
 
-    @Tool(description = "Search the product catalogue by (part of) a product name. "
-            + "Returns description, price, stock level and warranty information.")
-    public List<Product> findProducts(@ToolParam(description = "Product name or keyword, e.g. 'headphones'") String name) {
-        return productRepository.findByNameContainingIgnoreCase(name);
+    @Tool(description = "Search products by keyword to check price, stock, and warranty.")
+    public List<Product> findProducts(@ToolParam(description = "Product keyword, e.g. 'charger', 'headphones'", required = false) String name) {
+        if (name == null || name.isBlank()) {
+            return productRepository.findAll();
+        }
+        String trimmed = name.trim();
+        List<Product> direct = productRepository.findByNameContainingIgnoreCase(trimmed);
+        if (!direct.isEmpty()) {
+            return direct;
+        }
+        String[] keywords = trimmed.split("\\s+");
+        List<Product> all = productRepository.findAll();
+        List<Product> matches = all.stream()
+                .filter(p -> {
+                    String combined = (p.name() + " " + p.category() + " " + p.description()).toLowerCase();
+                    for (String kw : keywords) {
+                        if (kw.length() > 2 && combined.contains(kw.toLowerCase())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                .toList();
+        return matches.isEmpty() ? all : matches;
     }
 }
